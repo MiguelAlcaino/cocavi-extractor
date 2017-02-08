@@ -21,17 +21,26 @@
         <title>Cocavi Extractor</title>
     </head>
     <body>
-    <div class="container">
+    <div class="container-fluid">
         <h1>Cocaví Extractor!</h1>
         <h6>By <a href="http://miguelalcaino.cl" target="_blank">Miguel Alcaino</a> <i class="em em-rocket"></i></h6>
-        <ul>
-            {% for podcast in podcasts %}
-                <li>
-                    <a href="{{ podcast.link }}">{{ podcast.date }} <span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
-                </li>
-            {% endfor %}
-        </ul>
-
+        <table class="table">
+            <tbody>
+                {% for podcast in podcasts %}
+                    <tr>
+                        <td>
+                            <a href="{{ podcast.link }}">
+                                {{ podcast.date }}
+                                <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <span data-link="{{ podcast.link }}" data-name="{{ podcast.date }}" class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <nav aria-label="Page navigation">
             <ul class="pagination">
                 <li>
