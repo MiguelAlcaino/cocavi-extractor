@@ -6,7 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DefaultController extends Controller
 {
@@ -57,5 +57,24 @@ class DefaultController extends Controller
             'podcasts' => $arrayOfPodcasts,
             'pages' => $pages
         ));
+    }
+
+    /**
+     * @Route("/stream", name="stream_cocavi")
+     */
+    public function streamAction(){
+        return new StreamedResponse(function(){
+            header('Content-Type: application/octet-stream');
+            header('Content-disposition: attachment; filename="hola.mp4"');
+            $command = 'megaget --username=***** --password=***** /Root/VID_20150329_144648263.mp4 --path=-';
+            $fp = popen($command,'r');
+            $bufsize = 8192;
+            $buff = '';
+            while( !feof($fp) ) {
+                $buff = fread($fp, $bufsize);
+                echo $buff;
+            }
+            pclose($fp);
+        });
     }
 }
