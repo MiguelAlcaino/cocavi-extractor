@@ -17,8 +17,11 @@ class DefaultController extends Controller
     {
         $baseUrl = 'http://www.rinoceronte.fm/podcast/9';
         if($request->query->has('page')){
-            $url = $baseUrl.'?Podcast_page='.$request->query->get('page');
+            $currentPage = $request->query->get('page');
+            $url = $baseUrl.'?Podcast_page='.$currentPage;
+
         }else{
+            $currentPage = 1;
             $url = $baseUrl;
         }
 
@@ -53,9 +56,15 @@ class DefaultController extends Controller
             }
         }
 
+        $lastPage = $pagination->filter('li.last a')->first()->attr('href');
+        $lastPage = explode('Podcast_page=',$lastPage);
+        $lastPage = $lastPage[1];
+
         return $this->render('@App/Default/index.html.twig', array(
             'podcasts' => $arrayOfPodcasts,
-            'pages' => $pages
+            'pages' => $pages,
+            'currentPage' => $currentPage,
+            'lastPage' => $lastPage
         ));
     }
 
