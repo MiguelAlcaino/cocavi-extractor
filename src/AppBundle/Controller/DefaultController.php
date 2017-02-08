@@ -56,10 +56,15 @@ class DefaultController extends Controller
             }
         }
 
+        $lastPage = $pagination->filter('li.last a')->first()->attr('href');
+        $lastPage = explode('Podcast_page=',$lastPage);
+        $lastPage = $lastPage[1];
+
         return $this->render('@App/Default/index.html.twig', array(
             'podcasts' => $arrayOfPodcasts,
             'pages' => $pages,
-            'currentPage' => $currentPage
+            'currentPage' => $currentPage,
+            'lastPage' => $lastPage
         ));
     }
 }
