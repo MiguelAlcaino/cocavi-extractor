@@ -4,7 +4,6 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Podcast;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -20,8 +19,6 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        /** @var EntityManager $manager */
-        $manager = $this->getDoctrine()->getManager();
         $baseUrl = 'http://www.rinoceronte.fm/podcast/9';
         if($request->query->has('page')){
             $currentPage = $request->query->get('page');
@@ -37,33 +34,7 @@ class DefaultController extends Controller
         $crawler = new Crawler($html);
         $pagination = $crawler->filter('ul.pagination li');
 
-        $crawler = $crawler->filter('div.items li a');
-
-        $arrayOfPodcasts  = array();
-        /** @var \DOMElement $domElement */
-        foreach ($crawler as $domElement) {
-            $onclick = $domElement->getAttribute('onclick');
-            $link = str_replace('doSet(','',$onclick);
-            $link = str_replace(')','',$link);
-            $data = explode(',',$link);
-            $link = str_replace("'",'',$data[0]);
-
-            $arrayPodcast = array(
-                'link' => $link,
-                'date' => str_replace("'",'',$data[1])
-            );
-
-            $podcast = $manager->getRepository('AppBundle:Podcast')->findOneBy(array(
-                'originalUrl' => $link
-            ));
-            if(!is_null($podcast)){
-                $arrayPodcast['megaFileName'] = $podcast->getMegaName();
-                $arrayPodcast['id'] = $podcast->getId();
-            }
-
-            $arrayOfPodcasts[] = $arrayPodcast;
-
-        }
+        $arrayOfPodcasts = $this->get('app.services.cocavi_rinoceronte_service')->getPodcastsFromCrawler($crawler);
 
         $pages = array();
 
@@ -125,10 +96,11 @@ class DefaultController extends Controller
         $link = $request->request->get('link');
         $name = $request->request->get('name');
 
-        $command = sprintf($this->get('service_container')->getParameter('kernel.root_dir').'/../bin/console podcast:save %s "%s" > /dev/null 2>/dev/null &',$link,$name);
+        $command = sprintf("(".$this->get('service_container')->getParameter('kernel.root_dir').'/../bin/console podcast:save %s "%s") > /dev/null 2>/dev/null &',$link,$name);
         shell_exec($command);
         return new JsonResponse(array(
-            'status' => 'Todo bien!'
+            'status' => 'Todo bien!',
+            //'command' => $command
         ));
     }
 }

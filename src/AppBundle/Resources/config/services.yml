@@ -1,0 +1,4 @@
+services:
+    app.services.cocavi_rinoceronte_service:
+        class: AppBundle\Services\CocaviRinoceronteService
+        arguments: ['@doctrine']
