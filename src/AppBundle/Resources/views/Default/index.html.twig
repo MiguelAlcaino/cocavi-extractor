@@ -36,7 +36,12 @@
                             </a>
                         </td>
                         <td>
-                            <span data-link="{{ podcast.link }}" data-name="{{ podcast.date }}" class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+                            {% if podcast.megaFileName is defined %}
+                                <a href="{{ path('stream_cocavi', {'id': podcast.id}) }}"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></a>
+                            {% else %}
+                                <span data-link="{{ podcast.link }}" data-name="{{ podcast.date }}" class="glyphicon glyphicon-cloud-upload upload-podcast" aria-hidden="true"></span>
+                            {% endif %}
+
                         </td>
                     </tr>
                 {% endfor %}
@@ -62,5 +67,7 @@
             </ul>
         </nav>
     </div>
+    <script src="{{ asset('bundles/app/js/zepto.min.js') }}"></script>
+    <script src="{{ asset('bundles/app/js/main.js') }}"></script>
     </body>
 </html>

@@ -2,9 +2,14 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Podcast;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -15,6 +20,8 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
+        /** @var EntityManager $manager */
+        $manager = $this->getDoctrine()->getManager();
         $baseUrl = 'http://www.rinoceronte.fm/podcast/9';
         if($request->query->has('page')){
             $currentPage = $request->query->get('page');
@@ -40,10 +47,21 @@ class DefaultController extends Controller
             $link = str_replace(')','',$link);
             $data = explode(',',$link);
             $link = str_replace("'",'',$data[0]);
-            $arrayOfPodcasts[] = array(
+
+            $arrayPodcast = array(
                 'link' => $link,
                 'date' => str_replace("'",'',$data[1])
             );
+
+            $podcast = $manager->getRepository('AppBundle:Podcast')->findOneBy(array(
+                'originalUrl' => $link
+            ));
+            if(!is_null($podcast)){
+                $arrayPodcast['megaFileName'] = $podcast->getMegaName();
+                $arrayPodcast['id'] = $podcast->getId();
+            }
+
+            $arrayOfPodcasts[] = $arrayPodcast;
 
         }
 
@@ -69,13 +87,23 @@ class DefaultController extends Controller
     }
 
     /**
-     * @Route("/stream", name="stream_cocavi")
+     * @param Request $request
+     * @param int $id
+     * @return StreamedResponse
+     * @Route("/stream/{id}", name="stream_cocavi")
      */
-    public function streamAction(){
-        return new StreamedResponse(function(){
+    public function streamAction(Request $request, $id){
+        /** @var EntityManager $manager */
+        $manager = $this->getDoctrine()->getManager();
+        return new StreamedResponse(function() use($request, $manager, $id){
+            $podcast = $manager->getRepository('AppBundle:Podcast')->find($id);
             header('Content-Type: application/octet-stream');
-            header('Content-disposition: attachment; filename="hola.mp4"');
-            $command = 'megaget --username=***** --password=***** /Root/VID_20150329_144648263.mp4 --path=-';
+            header('Content-disposition: attachment; filename="'.$podcast->getMegaName().'"');
+            $megaUser = $this->getParameter('mega_user');
+            $megaPassword = $this->getParameter('mega_password');
+            $megaFolder = $this->getParameter('mega_folder');
+            $command = sprintf('megaget --username=%s --password=%s %s/%s --path=-',$megaUser, $megaPassword,$megaFolder,$podcast->getMegaName());
+
             $fp = popen($command,'r');
             $bufsize = 8192;
             $buff = '';
@@ -85,5 +113,22 @@ class DefaultController extends Controller
             }
             pclose($fp);
         });
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     * @Method({"POST"})
+     * @Route("/save-forever", name="save_cocavi_forever")
+     */
+    public function saveForeverAction(Request $request){
+        $link = $request->request->get('link');
+        $name = $request->request->get('name');
+
+        $command = sprintf($this->get('service_container')->getParameter('kernel.root_dir').'/../bin/console podcast:save %s "%s" > /dev/null 2>/dev/null &',$link,$name);
+        shell_exec($command);
+        return new JsonResponse(array(
+            'status' => 'Todo bien!'
+        ));
     }
 }
