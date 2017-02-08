@@ -40,7 +40,7 @@
                     </a>
                 </li>
                 {% for page in pages %}
-                    <li>
+                    <li class="{% if currentPage == page %}active{% endif %}">
                         <a href="{{ path('homepage', { page: page}) }}">{{ page }}</a>
                     </li>
                 {% endfor %}
