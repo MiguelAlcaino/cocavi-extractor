@@ -19,22 +19,14 @@ class DefaultController extends Controller
      */
     public function indexAction(Request $request)
     {
-        $baseUrl = 'http://www.rinoceronte.fm/podcast/9';
-        if($request->query->has('page')){
-            $currentPage = $request->query->get('page');
-            $url = $baseUrl.'?Podcast_page='.$currentPage;
-
-        }else{
-            $currentPage = 1;
-            $url = $baseUrl;
-        }
-
-        $html = file_get_contents($url);
+        $currentPage = $request->query->get('page',1);
+        $html = $this->get('app.services.cocavi_rinoceronte_service')->getHTML($currentPage);
 
         $crawler = new Crawler($html);
-        $pagination = $crawler->filter('ul.pagination li');
 
         $arrayOfPodcasts = $this->get('app.services.cocavi_rinoceronte_service')->getPodcastsFromCrawler($crawler);
+
+        $pagination = $crawler->filter('ul.pagination li');
 
         $pages = array();
 
