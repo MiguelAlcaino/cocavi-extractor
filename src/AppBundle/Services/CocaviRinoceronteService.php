@@ -65,4 +65,18 @@ class CocaviRinoceronteService
 
         return $arrayOfPodcasts;
     }
+
+    /**
+     * @param int $page
+     * @return string
+     */
+    public function getHTML($page = 1){
+        $baseUrl = 'http://www.rinoceronte.fm/podcast/9';
+        if($page != 1){
+            $url = $baseUrl.'?Podcast_page='.$page;
+        }else{
+            $url = $baseUrl;
+        }
+        return file_get_contents($url);
+    }
 }
