@@ -1,0 +1,17 @@
+body {
+    background-image: url("/images/Picnic-Spots-In-Klang-Valley-copy.jpg");
+    color: white;
+}
+
+@media (min-width: 768px) {
+    body {
+        background-image: url("/images/Picnic-Spots-In-Klang-Valley-copy.jpg");
+        background-size: 100%;
+        color: white;
+    }
+}
+
+a:link{
+    color: white;
+    font-weight: bold;
+}
