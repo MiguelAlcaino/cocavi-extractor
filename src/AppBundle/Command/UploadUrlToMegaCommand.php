@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -40,18 +41,17 @@ class UploadUrlToMegaCommand extends ContainerAwareCommand
         $filePath = "/tmp/".$randFileName;
         file_put_contents($filePath, fopen($input->getArgument('url'), 'r'));
 
-        $megaUser = $this->getContainer()->getParameter('mega_user');
-        $megaPassword = $this->getContainer()->getParameter('mega_password');
-        $megaFolder = $this->getContainer()->getParameter('mega_folder');
-        $command = sprintf('megaput --username=%s --password=%s --path=%s/%s --reload %s',$megaUser,$megaPassword,$megaFolder,$fileName,$filePath);
-        $output->writeln($command);
-        $process = new Process($command);
-        $process->setTimeout(3600);
-        $process->run();
 
-        if(!$process->isSuccessful()){
-            throw new ProcessFailedException($process);
-        }
+        $command = $this->getApplication()->find('mega:upload-from-file');
+
+        $arguments = array(
+            'command' => 'mega:upload-from-file',
+            'path'    => $filePath,
+            'fileName' => $fileName
+        );
+
+        $greetInput = new ArrayInput($arguments);
+        $command->run($greetInput, $output);
 
         $output->writeln($fileName);
     }

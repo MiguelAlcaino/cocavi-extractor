@@ -20,3 +20,4 @@ parameters:
     mega_user: ~
     mega_password: ~
     mega_folder: /Root/cocavi-extractor
+    mega_streamed_podcasts_folder: /Root/cocavi-streamed

@@ -1,0 +1,21 @@
+{% extends '@App/Layout/base.html.twig' %}
+{% block content %}
+    <table class="table">
+        <tbody>
+        {% for streamedPodcast in streamedPodcasts %}
+            <tr>
+                <td>
+                    <a href="{{ path('stream_streamed_cocavi', {id: streamedPodcast.id}) }}">
+                        Cocav&iacute; - {{ streamedPodcast.created|date('d m Y') }}
+                        <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+                    </a>
+                </td>
+                <td>
+                    <a title="Respaldo! desde mega.nz" href="{{ path('stream_streamed_cocavi', {'id': streamedPodcast.id}) }}"><span class="glyphicon glyphicon-cloud-download" aria-hidden="true"></span></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
