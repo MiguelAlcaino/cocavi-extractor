@@ -13,3 +13,8 @@ $('.upload-podcast').click(function(){
     });
 });
 
+$('#que-hace-link').click(function(e){
+    e.preventDefault();
+   $('#que-hace-list').slideToggle();
+});
+

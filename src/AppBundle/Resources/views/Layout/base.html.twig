@@ -14,11 +14,24 @@
 <body>
 <div class="container-fluid">
     <a href="{{ path('homepage') }}"><h1>Cocaví Extractor!</h1></a>
-    <h6><a href="{{ path('streamed_podcasts') }}">Escucha Primero!</a> | Qué hace? | <a href="https://github.com/MiguelAlcaino/cocavi-extractor">Fork me</a> | By <a href="http://miguelalcaino.cl" target="_blank">Miguel Alcaino</a> <i class="em em-rocket"></i></h6>
+    <h6><a href="{{ path('homepage') }}">Home</a> |
+        <a href="{{ path('streamed_podcasts') }}">Escuchalo Primero!</a> |
+        <a href="" id="que-hace-link">Qué hace?</a> |
+        <a href="https://github.com/MiguelAlcaino/cocavi-extractor">Fork me</a> |
+        By <a href="http://miguelalcaino.cl" target="_blank">Miguel Alcaino</a> <i class="em em-rocket"></i>
+    </h6>
+    <ul id="que-hace-list" class="list-group" style="display: none;">
+        <li class="list-group-item list-group-item-success">Cocav&iacute; Extractor es una herramienta que extrae y facilita la descarga los podcast de Cocav&iacute; de radio Rinoceronte.</li>
+        <li class="list-group-item list-group-item-info">En la secci&oacute;n <strong>Home</strong> encontrar&aacute;s la lista de capitulos publicados por radio Rinoceronte en su p&aacute;gina web.
+            La diferencia es que ac&aacute; podr&aacute;s decargar el cap&iacute;tulo y avanzar y retroceder cuando est&eacute;s escuchando.</li>
+        <li class="list-group-item list-group-item-warning">En la secci&oacute;n <strong>Escuchalo primero!</strong> podr&aacute;s escuchar los cap&iacute;tulos 15 minutos desp&uacute;es de que terminan!.
+         Esto es logrado gracias a un robot que se pone a grabar el Cocav&iacute; de Lunes a Viernes a las 12.00 para despu&eacute;s subirlo a un servidor.</li>
+        <li class="list-group-item list-group-item-danger">Si eres un desarrollador Symfony y quieres contribuir con el proyecto clickea <strong>Fork me!</strong></li>
+    </ul>
 
     {% block content %}{% endblock %}
 </div>
-<script src="{{ asset('bundles/app/js/zepto.min.js') }}"></script>
+<script src="{{ asset('bundles/app/js/jquery-3.1.1.min.js') }}"></script>
 <script src="{{ asset('bundles/app/js/main.js') }}"></script>
 </body>
 </html>
