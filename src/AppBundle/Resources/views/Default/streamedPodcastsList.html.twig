@@ -6,7 +6,7 @@
             <tr>
                 <td>
                     <a href="{{ path('stream_streamed_cocavi', {id: streamedPodcast.id}) }}">
-                        Cocav&iacute; - {{ streamedPodcast.created|date('d m Y') }}
+                        Cocav&iacute; - {{ streamedPodcast.created|localizeddate('long','none','es') }}
                         <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                     </a>
                 </td>
