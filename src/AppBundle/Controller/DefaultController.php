@@ -21,33 +21,55 @@ class DefaultController extends Controller
     public function indexAction(Request $request)
     {
         $currentPage = $request->query->get('page',1);
-        $html = $this->get('app.services.cocavi_rinoceronte_service')->getHTML($currentPage);
+        $arrayForView = [];
+        try {
+            $html = $this->get('app.services.cocavi_rinoceronte_service')->getHTML($currentPage);
 
-        $crawler = new Crawler($html);
+            $crawler = new Crawler($html);
 
-        $arrayOfPodcasts = $this->get('app.services.cocavi_rinoceronte_service')->getPodcastsFromCrawler($crawler);
+            $arrayOfPodcasts = $this->get('app.services.cocavi_rinoceronte_service')->getPodcastsFromCrawler($crawler);
+            $pagination = $crawler->filter('ul.pagination li');
 
-        $pagination = $crawler->filter('ul.pagination li');
+            $pages = array();
 
-        $pages = array();
+            /** @var \DOMElement $domElement */
+            foreach ($pagination as $domElement){
+                if(is_numeric($domElement->textContent)){
+                    $pages[] = $domElement->textContent;
+                }
+            }
 
-        /** @var \DOMElement $domElement */
-        foreach ($pagination as $domElement){
-            if(is_numeric($domElement->textContent)){
-                $pages[] = $domElement->textContent;
+            $lastPage = $pagination->filter('li.last a')->first()->attr('href');
+            $lastPage = explode('Podcast_page=',$lastPage);
+            $lastPage = $lastPage[1];
+            $arrayForView = [
+                'pages' => $pages,
+                'currentPage' => $currentPage,
+                'lastPage' => $lastPage
+            ];
+        }catch (\Exception $exception){
+            $manager = $this->getDoctrine()->getManager();
+
+            $podcasts = $manager->getRepository('AppBundle:Podcast')->findBy(
+                [],
+                [
+                    'id' => 'DESC'
+                ]
+            );
+
+            foreach($podcasts as $podcast){
+                $arrayOfPodcasts[] = [
+                    'link' => $podcast->getOriginalUrl(),
+                    'date' => $podcast->getMegaName(),
+                    'megaFileName' => $podcast->getMegaName(),
+                    'id' => $podcast->getId()
+                ];
             }
         }
 
-        $lastPage = $pagination->filter('li.last a')->first()->attr('href');
-        $lastPage = explode('Podcast_page=',$lastPage);
-        $lastPage = $lastPage[1];
+        $arrayForView['podcasts'] = $arrayOfPodcasts;
 
-        return $this->render('@App/Default/index.html.twig', array(
-            'podcasts' => $arrayOfPodcasts,
-            'pages' => $pages,
-            'currentPage' => $currentPage,
-            'lastPage' => $lastPage
-        ));
+        return $this->render('@App/Default/index.html.twig', $arrayForView);
     }
 
     /**

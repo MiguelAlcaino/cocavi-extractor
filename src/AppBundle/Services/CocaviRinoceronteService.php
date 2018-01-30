@@ -27,6 +27,11 @@ class CocaviRinoceronteService
         $this->doctrine = $doctrine;
     }
 
+    private function getHttpResponseCode($url) {
+        $headers = get_headers($url);
+        return substr($headers[0], 9, 3);
+    }
+
     /**
      * @param Crawler $crawler
      * @return array
@@ -68,7 +73,9 @@ class CocaviRinoceronteService
 
     /**
      * @param int $page
-     * @return string
+     * @return bool|string
+     * @throws \Exception
+     * @author malcaino
      */
     public function getHTML($page = 1){
         $baseUrl = 'http://www.rinoceronte.fm/podcast/9';
@@ -77,6 +84,12 @@ class CocaviRinoceronteService
         }else{
             $url = $baseUrl;
         }
-        return file_get_contents($url);
+
+        if($this->getHttpResponseCode($url) !== "200"){
+            throw new \Exception('La pagina retornó un 404');
+        }else{
+            return file_get_contents($url);
+        }
+
     }
 }

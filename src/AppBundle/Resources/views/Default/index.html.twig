@@ -21,6 +21,7 @@
         {% endfor %}
         </tbody>
     </table>
-
-    {% include '@App/Default/paginator.html.twig' %}
+    {% if pages is defined %}
+        {% include '@App/Default/paginator.html.twig' %}
+    {% endif %}
 {% endblock %}
